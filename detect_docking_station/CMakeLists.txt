@@ -16,13 +16,22 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
+link_directories(${LIBRARY_OUTPUT_PATH})
+link_directories(/usr/local/lib)
+link_directories(/usr/lib)
+
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
 #rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
+
+rosbuild_add_library(HardCodedLine src/HardCodedLine.cpp)
+
+rosbuild_add_library(ScanScore src/scan_score.cpp)
+target_link_libraries(ScanScore HardCodedLine)
+
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
