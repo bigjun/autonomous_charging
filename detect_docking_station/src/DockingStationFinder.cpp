@@ -43,10 +43,29 @@ DockingStationFinder::~DockingStationFinder(){
 
 vector<float> DockingStationFinder::getMostLikelyLocation(vector<float> & laser_x, vector<float> & laser_y){
 	vector<float> ret;
+	float best = -1;
 	//tx
 	//ty
 	//rotation
 	//score
+	for(unsigned int i = 0; i < laser_x.size(); i++){
+		float start_x = laser_x.at(i);
+		float start_y = laser_y.at(i);
+		for(float angle = 0; angle < 2*3.14; angle+=0.01){
+			for(int k = 0; k < model.size(); k++){
+				model.at(k)->transform(start_x,start_y,angle);
+			}
+			float current_score = score(model,laser_x,laser_y,0.001);
+			if(current_score > best){
+				best = current_score;
+				if(ret.size() == 0){ret.resize(4);}
+				ret.at(0) = start_x;
+				ret.at(1) = start_y;
+				ret.at(2) = angle;
+				ret.at(3) = current_score;
+			}
+		}
+	}
 	return ret;
 }
 
