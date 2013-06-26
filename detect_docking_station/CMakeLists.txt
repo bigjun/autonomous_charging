@@ -29,11 +29,12 @@ link_directories(/usr/lib)
 
 rosbuild_add_library(HardCodedLine src/HardCodedLine.cpp)
 
-rosbuild_add_library(ScanScore src/scan_score.cpp)
-target_link_libraries(ScanScore HardCodedLine)
+rosbuild_add_library(DockingStationFinder src/DockingStationFinder.cpp)
+target_link_libraries(DockingStationFinder HardCodedLine)
 
 #target_link_libraries(${PROJECT_NAME} another_library)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 rosbuild_add_executable(docking_station_detector src/docking_station_detector.cpp)
+target_link_libraries(docking_station_detector DockingStationFinder)
 #target_link_libraries(example ${PROJECT_NAME})
