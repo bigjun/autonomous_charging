@@ -16,20 +16,20 @@ class HardCodedLine
 	float transformed_point_y1;
 	float transformed_point_x2;
 	float transformed_point_y2;
-	
+	float tx;
+	float ty;
+	float length;
 	//Input the start and the stop of the line
-	HardCodedLine(float x1, float y1, float x2, float y2);	
+	HardCodedLine(float x1, float y1, float x2, float y2);
 
 	//Standard constructor, does nothing exept give the segment an id.	
-	HardCodedLine();
-
+	HardCodedLine()	;
 	//Standard destructor
 	~HardCodedLine();
 
 	//Transforms the points of the line so that we can test different transformations of models.
 	void transform(float tx, float ty, float r);
-
 	//Distance to line between transformed points
-	float distance(float x, float y);
+	  float distance(float x, float y);
 };
 #endif
