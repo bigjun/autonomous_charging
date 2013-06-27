@@ -10,7 +10,10 @@
   <url>http://ros.org/wiki/detect_docking_station</url>
   <depend package="sensor_msgs"/>
   <depend package="roscpp"/>
-
+  <!--depend package="simple_navigation_goals"/-->
+  <depend package="move_base_msgs"/>
+  <depend package="actionlib"/>
 </package>
 
 
+  

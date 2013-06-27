@@ -50,6 +50,9 @@ DockingStationFinder::getMostLikelyLocation (vector<float> & laser_x, vector<flo
   //ty
   //rotation
   //score
+
+  float noise = 0.005;
+  float noise_sq = noise * noise;
   for (unsigned int i = 0; i < laser_x.size (); i++)
   {
     float start_x = laser_x.at (i);
@@ -60,7 +63,7 @@ DockingStationFinder::getMostLikelyLocation (vector<float> & laser_x, vector<flo
       {
         model.at (k)->transform (start_x, start_y, angle);
       }
-      float current_score = score (model, laser_x, laser_y, 0.005);
+      float current_score = score (model, laser_x, laser_y, noise_sq);
       if (current_score > best)
       {
         best = current_score;
@@ -99,7 +102,10 @@ DockingStationFinder::score (vector<HardCodedLine*> & model, vector<float> & x, 
         smallest = d;
       }
     }
-    total_score += exp (-0.5 * smallest * smallest / noise);//Score is based on a gaussian using the noise and the shortest distance a line in the model
+
+    //if(smallest < 2*noise)
+    total_score += exp (-0.5 * smallest * smallest / noise);
+    //total_score += exp (-0.5 * smallest * smallest / noise);//Score is based on a gaussian using the noise and the shortest distance a line in the model
   }
   return total_score;
 }
