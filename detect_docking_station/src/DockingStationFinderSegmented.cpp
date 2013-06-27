@@ -8,7 +8,7 @@ DockingStationFinderSegmented::DockingStationFinderSegmented(){
 	max_segment_size = 0.47;
 
 	max_diff_from_expected = 0.15;
-	expected_diff = 0.9-0.467;//0.53-0.467;//Measured difference between arc-lenght(53 cm) and width(46.7 cm) of charger
+	expected_diff = 0.8-0.467;//0.53-0.467;//Measured difference between arc-lenght(53 cm) and width(46.7 cm) of charger
 }
 
 
