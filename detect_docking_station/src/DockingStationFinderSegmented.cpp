@@ -76,8 +76,8 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
 
 		float length_size_diff = segment_arc_length - segment_size;
 		if(segment_size > min_segment_size && segment_size < max_segment_size && fabs(length_size_diff-expected_diff) < max_diff_from_expected){//Likely segment
-			ret.at (0) = end_x;
-        	ret.at (1) = end_y;
+			ret.at (0) = (end_x+start_x)/2;
+        	ret.at (1) = (end_y+start_y)/2; 
         	ret.at (2) = acos(1*dx+0*dy);
         	ret.at (3) = 1000;
 		}
