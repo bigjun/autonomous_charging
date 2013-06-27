@@ -110,8 +110,8 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
 		if(segment_size > 0.3 && segment_size < 0.5 && fabs(length_size_diff-expected_diff) < 0.01){
 			printf("--THIS---> ");
 
-			ret.at (0) = start_x;
-        	ret.at (1) = start_y;
+			ret.at (0) = end_x;
+        	ret.at (1) = end_y;
         	ret.at (2) = acos(1*dx+0*dy);
         	ret.at (3) = 1000;
 		}
