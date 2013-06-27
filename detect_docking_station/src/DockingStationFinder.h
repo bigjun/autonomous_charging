@@ -11,9 +11,10 @@ class DockingStationFinder
 {
 	public:
 	DockingStationFinder();
-	~DockingStationFinder();
+	virtual ~DockingStationFinder();
 
-	vector<float> getMostLikelyLocation(vector<float> & laser_x, vector<float> & laser_y);
+
+	virtual vector<float> getMostLikelyLocation(vector<float> & laser_x, vector<float> & laser_y);
 	private:
 	vector<HardCodedLine*> model;
 	float score(vector<HardCodedLine*> & model, vector<float> & x, vector<float> & y, float noise);

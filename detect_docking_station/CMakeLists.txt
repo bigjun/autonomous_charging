@@ -29,7 +29,7 @@ link_directories(/usr/lib)
 
 rosbuild_add_library(HardCodedLine src/HardCodedLine.cpp)
 
-rosbuild_add_library(DockingStationFinder src/DockingStationFinder.cpp)
+rosbuild_add_library(DockingStationFinder src/DockingStationFinder.cpp src/DockingStationFinderSegmented.cpp)
 target_link_libraries(DockingStationFinder HardCodedLine)
 
 #target_link_libraries(${PROJECT_NAME} another_library)
