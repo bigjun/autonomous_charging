@@ -4,11 +4,11 @@ DockingStationFinderSegmented::DockingStationFinderSegmented(){
 	printf("segmentation based\n");
 
 	max_angle_diff = 0.3;
-	min_segment_size = 0.40;
+	min_segment_size = 0.42;
 	max_segment_size = 0.47;
 
-	max_diff_from_expected = 10.01;
-	expected_diff = 0.53-0.467;//Measured difference between arc-lenght(53 cm) and width(46.7 cm) of charger
+	max_diff_from_expected = 0.15;
+	expected_diff = 0.9-0.467;//0.53-0.467;//Measured difference between arc-lenght(53 cm) and width(46.7 cm) of charger
 }
 
 
