@@ -82,8 +82,9 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
         	ret.at (2) = acos(1*dx+0*dy);
         	ret.at (3) = 1000;
 			printf("--THIS-->");
+printf(" %i to %i -> %f %f\n",starti,i,segment_size,segment_arc_length);
 		}
-		printf(" %i to %i -> %f %f\n",starti,i,segment_size,segment_arc_length);
+		//
 	}
   return ret;
 }

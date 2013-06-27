@@ -175,6 +175,7 @@ DockingStationDetector
       float goal_y_base = goal_laser[1];
 
       publishMarker(goal_x_base, goal_y_base,out[2], "/base_link");
+      std::cout << "Relative to the robot (base_link):" << goal_x_base << " " << goal_y_base << std::endl;
       //transform goal to /map coordinates
       /*{
         tf::TransformListener listener;
@@ -191,7 +192,7 @@ DockingStationDetector
         tf::Vector3 base_goal_map_cs(goal_x_base, goal_y_base, 0);
         base_goal_map_cs = transform * base_goal_map_cs;
         publishMarker(base_goal_map_cs[0], base_goal_map_cs[1],out[2], "/map");
-        std::cout << base_goal_map_cs[0] << " " << base_goal_map_cs[1] << std::endl;
+
       }*/
 
       if(out[3] < object_found_threshold_)
