@@ -5,6 +5,7 @@
 
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <tf/transform_listener.h>
 
 class
 DockingStationDetector
@@ -30,11 +31,11 @@ DockingStationDetector
       ros::spin();
     }
 
-    void publishMarker(float x, float y, float angle, bool add=true)
+    void publishMarker(float x, float y, float angle, std::string link, bool add=true)
     {
       uint32_t shape = visualization_msgs::Marker::CUBE;
       visualization_msgs::Marker marker;
-      marker.header.frame_id = "/base_laser_link";
+      marker.header.frame_id = link;
       marker.header.stamp = ros::Time::now();
 
       // Set the namespace and id for this marker.  This serves to create a unique ID
@@ -52,8 +53,10 @@ DockingStationDetector
 
       // Set the pose of the marker.  This is a full 6DOF pose relative to the frame/time specified in the header
       angle = angle - 3.141692;
-      y = y - 0.3f;
-      x = x - 0.476f/2;
+      //y = y - 0.3f;
+      //x = x - 0.476f/2;
+      x -= 0.3f;
+      y -= 0.476 / 2;
       marker.pose.position.x = x;
       marker.pose.position.y = y;
       marker.pose.position.z = 0;
@@ -69,7 +72,7 @@ DockingStationDetector
       marker.color.r = 0.0f;
       marker.color.g = 1.0f;
       marker.color.b = 0.0f;
-      marker.color.a = 1.0;
+      marker.color.a = 0.70;
 
       marker.lifetime = ros::Duration();
 
@@ -94,14 +97,38 @@ DockingStationDetector
 
       std::vector<float> out = dsf_.getMostLikelyLocation(x_scan, y_scan);
       std::cout << "best score:" << " " << out[0] << " " << out[1] << " " << out[2] << " " << out[3] << std::endl;
-      if(out[3] < object_found_threshold_)
-      {
-        publishMarker(out[0],out[1],out[2], false);
-        return;
-      }
 
       //publish a marker with the position
-      publishMarker(out[0],out[1],out[2]);
+      //publishMarker(out[0],out[1],out[2], "/base_laser_link");
+
+      //get transform from laser to base_link
+      float goal_x_laser = out[0]; //- 0.3f;
+      float goal_y_laser = out[1]; // - 0.476 / 2;
+      tf::TransformListener listener;
+      tf::StampedTransform transform;
+      try{
+        listener.waitForTransform("/base_link", "/base_laser_link", ros::Time(0), ros::Duration(10.0) );
+        listener.lookupTransform("/base_link", "/base_laser_link",
+                                 ros::Time(0), transform);
+      }
+      catch (tf::TransformException ex){
+        ROS_ERROR("%s",ex.what());
+      }
+
+      tf::Vector3 origin = transform.getOrigin();
+      std::cout << origin[0] << " - " << origin[1] << std::endl;
+
+      //transform goal to base link coordinates
+      tf::Vector3 goal_laser(goal_x_laser, goal_y_laser, 0);
+      float goal_x_base = goal_laser[0] + origin[0];
+      float goal_y_base = goal_laser[1];
+
+      publishMarker(goal_x_base, goal_y_base,out[2], "/base_link");
+
+      if(out[3] < object_found_threshold_)
+      {
+        return;
+      }
 
       //use action lib to move the robot there
       typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -111,18 +138,21 @@ DockingStationDetector
       }
 
       move_base_msgs::MoveBaseGoal goal;
-      goal.target_pose.header.frame_id = "base_laser_link";
+      goal.target_pose.header.frame_id = "/base_link";
       goal.target_pose.header.stamp = ros::Time::now();
-      goal.target_pose.pose.position.x = out[0]- 0.476f/2;
-      goal.target_pose.pose.position.y = out[1] - 0.3;
+      goal.target_pose.pose.position.x = goal_x_base;
+      goal.target_pose.pose.position.y = goal_y_base;
       goal.target_pose.pose.orientation.w = 1.0;
       ac.sendGoal(goal);
-      ac.waitForResult(ros::Duration(25.0));
-
+      ac.waitForResult(ros::Duration(100.0));
       if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-        ROS_INFO("Hooray, the base moved 1 meter forward");
+      {
+        ROS_INFO("Hooray, the base moved to the goal");
+      }
       else
-        ROS_INFO("The base failed to move forward 1 meter for some reason");
+      {
+        ROS_INFO("The base failed to move to the goal");
+      }
     }
 };
 

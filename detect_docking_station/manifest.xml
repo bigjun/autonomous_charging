@@ -13,6 +13,7 @@
   <!--depend package="simple_navigation_goals"/-->
   <depend package="move_base_msgs"/>
   <depend package="actionlib"/>
+  <depend package="tf"/>
 </package>
 
 
