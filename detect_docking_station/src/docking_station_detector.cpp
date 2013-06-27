@@ -71,8 +71,6 @@ DockingStationDetector
       //goal.target_pose.header.frame_id = "/base_link";
       goal.target_pose.header.frame_id = "/map";
       goal.target_pose.header.stamp = ros::Time::now();
-      goal.target_pose.pose.position.x = base_goal_[0];
-      goal.target_pose.pose.position.y = base_goal_[1];
       goal.target_pose.pose.position.x = base_goal_map_cs[0];
       goal.target_pose.pose.position.y = base_goal_map_cs[1];
       goal.target_pose.pose.orientation.x = 0.0;
@@ -115,7 +113,7 @@ DockingStationDetector
       angle = angle - 3.141692;
       //y = y - 0.3f;
       //x = x - 0.476f/2;
-      x -= 0.7f;
+      //x -= 0.7f;
       marker.pose.position.x = x;
       marker.pose.position.y = y;
       marker.pose.position.z = 0;
@@ -141,28 +139,20 @@ DockingStationDetector
 
     void laserScan_callback(const sensor_msgs::LaserScan::ConstPtr& msg)
     {
-      //ROS_INFO("Laser scan received... %d", (int)(msg->ranges.size()));
-      //ROS_INFO("min angle: %f max_angle: %f", msg->angle_min, msg->angle_max);
-      //ROS_INFO("min range: %f max range: %f", msg->range_min, msg->range_max);
+      //transform laser scan to dsf format
       std::vector<float> x_scan, y_scan;
       x_scan.resize(msg->ranges.size());
       y_scan.resize(msg->ranges.size());
-
       for(size_t i=0; i < msg->ranges.size(); i++)
       {
         x_scan[i] = msg->ranges[i] * cos(msg->angle_min + msg->angle_increment * i);
         y_scan[i] = msg->ranges[i] * sin(msg->angle_min + msg->angle_increment * i);
       }
-
       std::vector<float> out = dsf_->getMostLikelyLocation(x_scan, y_scan);
-      //std::cout << "best score:" << " " << out[0] << " " << out[1] << " " << out[2] << " " << out[3] << std::endl;
-
-      //publish a marker with the position
-      publishMarker(out[0],out[1],out[2], "/base_laser_link");
 
       //get transform from laser to base_link
-      float goal_x_laser = out[0]; //- 0.3f;
-      float goal_y_laser = out[1]; // - 0.476 / 2;
+      float goal_x_laser = out[0] - 0.3f;
+      float goal_y_laser = out[1];
       tf::TransformListener listener;
       tf::StampedTransform transform;
       try{
@@ -175,14 +165,30 @@ DockingStationDetector
       }
 
       tf::Vector3 origin = transform.getOrigin();
-      //std::cout << origin[0] << " - " << origin[1] << std::endl;
-
       //transform goal to base link coordinates
       tf::Vector3 goal_laser(goal_x_laser, goal_y_laser, 0);
       float goal_x_base = goal_laser[0] + origin[0];
       float goal_y_base = goal_laser[1];
 
       //publishMarker(goal_x_base, goal_y_base,out[2], "/base_link");
+      //transform goal to /map coordinates
+      {
+        tf::TransformListener listener;
+        tf::StampedTransform transform;
+        try{
+          listener.waitForTransform("/map", "/base_link", ros::Time(0), ros::Duration(10.0) );
+          listener.lookupTransform("/map", "/base_link",
+                                   ros::Time(0), transform);
+        }
+        catch (tf::TransformException ex){
+          ROS_ERROR("%s",ex.what());
+        }
+
+        tf::Vector3 base_goal_map_cs(goal_x_base, goal_y_base, 0);
+        base_goal_map_cs = transform * base_goal_map_cs;
+        publishMarker(base_goal_map_cs[0], base_goal_map_cs[1],out[2], "/map");
+        std::cout << base_goal_map_cs[0] << " " << base_goal_map_cs[1] << std::endl;
+      }
 
       if(out[3] < object_found_threshold_)
       {
@@ -190,6 +196,7 @@ DockingStationDetector
       }
       else
       {
+        //if threshold is ok, then save goal!
         base_goal_ = tf::Vector3(goal_x_base, goal_y_base, out[2]);
       }
     }
