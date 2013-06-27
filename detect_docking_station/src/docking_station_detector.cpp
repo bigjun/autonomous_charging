@@ -51,7 +51,9 @@ DockingStationDetector
           ROS_INFO("Waiting for the move_base action server to come up");
       }
 
-      tf::TransformListener listener;
+      tf::Vector3 base_goal_map_cs(base_goal_[0], base_goal_[1], 0);
+
+      /*tf::TransformListener listener;
       tf::StampedTransform transform;
       try{
         listener.waitForTransform("/map", "/base_link", ros::Time(0), ros::Duration(10.0) );
@@ -63,20 +65,20 @@ DockingStationDetector
       }
 
       tf::Vector3 base_goal_map_cs(base_goal_[0], base_goal_[1], 0);
-      base_goal_map_cs = transform * base_goal_map_cs;
+      base_goal_map_cs = transform * base_goal_map_cs;*/
 
       std::cout << "Service called, navigating to:" << base_goal_map_cs[0] << " " << base_goal_map_cs[1] << " in MAP CS" << std::endl;
 
       move_base_msgs::MoveBaseGoal goal;
-      //goal.target_pose.header.frame_id = "/base_link";
-      goal.target_pose.header.frame_id = "/map";
+      goal.target_pose.header.frame_id = "/base_link";
+      //goal.target_pose.header.frame_id = "/map";
       goal.target_pose.header.stamp = ros::Time::now();
       goal.target_pose.pose.position.x = base_goal_map_cs[0];
       goal.target_pose.pose.position.y = base_goal_map_cs[1];
       goal.target_pose.pose.orientation.x = 0.0;
       goal.target_pose.pose.orientation.y = 0.0;
-      goal.target_pose.pose.orientation.z = 1.0;
-      goal.target_pose.pose.orientation.w = 0.0;
+      goal.target_pose.pose.orientation.z = 0.0;
+      goal.target_pose.pose.orientation.w = 1.0;
       ac.sendGoal(goal);
       ac.waitForResult(ros::Duration(50.0));
       if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
@@ -87,6 +89,8 @@ DockingStationDetector
       {
         ROS_INFO("The base failed to move to the goal");
       }
+
+      return true;
     }
 
     void publishMarker(float x, float y, float angle, std::string link, bool add=true)
@@ -170,9 +174,9 @@ DockingStationDetector
       float goal_x_base = goal_laser[0] + origin[0];
       float goal_y_base = goal_laser[1];
 
-      //publishMarker(goal_x_base, goal_y_base,out[2], "/base_link");
+      publishMarker(goal_x_base, goal_y_base,out[2], "/base_link");
       //transform goal to /map coordinates
-      {
+      /*{
         tf::TransformListener listener;
         tf::StampedTransform transform;
         try{
@@ -188,7 +192,7 @@ DockingStationDetector
         base_goal_map_cs = transform * base_goal_map_cs;
         publishMarker(base_goal_map_cs[0], base_goal_map_cs[1],out[2], "/map");
         std::cout << base_goal_map_cs[0] << " " << base_goal_map_cs[1] << std::endl;
-      }
+      }*/
 
       if(out[3] < object_found_threshold_)
       {
