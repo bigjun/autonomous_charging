@@ -23,7 +23,7 @@ link_directories(/usr/lib)
 #uncomment if you have defined messages
 #rosbuild_genmsg()
 #uncomment if you have defined services
-#rosbuild_gensrv()
+rosbuild_gensrv()
 
 #common commands for building c++ executables and libraries
 
