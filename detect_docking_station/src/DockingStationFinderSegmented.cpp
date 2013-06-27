@@ -55,7 +55,8 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
 		float start_x = laser_x.at(i);
 		float start_y = laser_y.at(i);
 		while(i+1 < laser_x.size()){
-			if(fabs(angles[i]) > max_angle_diff){break;}
+			//if(fabs(angles[i]) > max_angle_diff){break;}
+			if(fabs(distances[i]) > 0.05){break;}
 			i++;
 		}
 
@@ -80,7 +81,9 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
         	ret.at (1) = (end_y+start_y)/2; 
         	ret.at (2) = acos(1*dx+0*dy);
         	ret.at (3) = 1000;
+			printf("--THIS-->");
 		}
+		printf(" %i to %i -> %f %f\n",starti,i,segment_size,segment_arc_length);
 	}
   return ret;
 }
