@@ -4,7 +4,7 @@ DockingStationFinderSegmented::DockingStationFinderSegmented(){
 	printf("segmentation based\n");
 
 	max_angle_diff = 0.3;
-	min_segment_size = 0.43;
+	min_segment_size = 0.40;
 	max_segment_size = 0.47;
 
 	max_diff_from_expected = 10.01;
@@ -56,7 +56,7 @@ DockingStationFinderSegmented::getMostLikelyLocation (vector<float> & laser_x, v
 		float start_y = laser_y.at(i);
 		while(i+1 < laser_x.size()){
 			//if(fabs(angles[i]) > max_angle_diff){break;}
-			if(fabs(distances[i]) > 0.05){break;}
+			if(fabs(distances[i]) > 0.10){break;}
 			i++;
 		}
 
